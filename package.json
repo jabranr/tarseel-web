@@ -21,14 +21,22 @@
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20230518.0",
+    "@headlessui/react": "^1.7.17",
+    "@heroicons/react": "^2.0.18",
+    "@jabranr-lab/prettier": "^1.2.1",
     "@remix-run/dev": "^2.2.0",
     "@remix-run/eslint-config": "^2.2.0",
+    "@tabler/icons-react": "^2.42.0",
+    "@tailwindcss/forms": "^0.5.7",
     "@types/react": "^18.2.20",
     "@types/react-dom": "^18.2.7",
+    "classnames": "^2.3.2",
     "eslint": "^8.38.0",
+    "tailwindcss": "^3.3.5",
     "typescript": "^5.1.0",
     "wrangler": "3.8.0"
   },
+  "prettier": "@jabranr-lab/prettier",
   "engines": {
     "node": ">=18.0.0"
   }
