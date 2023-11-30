@@ -1,4 +1,4 @@
-import { Form, useLoaderData } from '@remix-run/react';
+import { Form, useActionData, useLoaderData } from '@remix-run/react';
 import InputSelect from '~/components/InputSelect';
 import InputText from '~/components/InputText';
 import InputTextArea from '~/components/InputTextArea';
@@ -7,6 +7,7 @@ import { action } from './action';
 import {
   IconArrowRight,
   IconCurrencyPound,
+  IconExclamationCircle,
   IconRulerMeasure,
   IconWeight
 } from '@tabler/icons-react';
@@ -15,6 +16,7 @@ import Button from '~/components/Button';
 export { loader, action };
 export default function SendParcel() {
   const { parcelTypes, deliverBy } = useLoaderData<typeof loader>();
+  const actionData = useActionData<typeof action>();
 
   return (
     <Form
@@ -22,6 +24,12 @@ export default function SendParcel() {
       method="POST"
       className="max-w-sm mx-auto flex flex-col space-y-8"
     >
+      {actionData?.formError && (
+        <p className="text-sm text-red-800 font-medium flex items-center">
+          <IconExclamationCircle className="w-5 h-5 mr-1" />
+          {actionData?.formError}
+        </p>
+      )}
       <InputSelect
         name="type"
         label="What is the type of parcel?"

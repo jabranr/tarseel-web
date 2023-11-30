@@ -1,7 +1,9 @@
 import { Form, Link } from '@remix-run/react';
 import Button from '~/components/Button';
 import InputText from '~/components/InputText';
+import { action } from './action';
 
+export { action };
 export default function Login() {
   return (
     <Form
