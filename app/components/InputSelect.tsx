@@ -11,6 +11,11 @@ export default function InputSelect({
       {label && (
         <label className="block text-sm font-medium leading-6 text-gray-900">
           {label}
+          {!props.required && (
+            <span className="ml-1 text-xs text-tarseel-gray-dark">
+              (optional)
+            </span>
+          )}
         </label>
       )}
       <select
