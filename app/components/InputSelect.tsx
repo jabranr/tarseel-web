@@ -6,10 +6,15 @@ export default function InputSelect({
   label,
   ...props
 }: ComponentProps<'select'> & { label?: string }) {
+  const id = props.id || props.name;
+
   return (
     <div>
       {label && (
-        <label className="block text-sm font-medium leading-6 text-gray-900">
+        <label
+          htmlFor={id}
+          className="block text-sm font-medium leading-6 text-gray-900"
+        >
           {label}
           {!props.required && (
             <span className="ml-1 text-xs text-tarseel-gray-dark">
@@ -19,6 +24,7 @@ export default function InputSelect({
         </label>
       )}
       <select
+        id={id}
         defaultValue=""
         className="relative w-full cursor-default mt-1 rounded-md bg-white py-1.5 pl-3 pr-10 text-left text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:outline-none focus:ring-2 focus:ring-tarseel-primary sm:text-sm sm:leading-6"
         {...props}

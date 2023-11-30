@@ -6,7 +6,7 @@ export default function Layout() {
   return (
     <>
       <Header />
-      <main className="mx-auto lg:container p-4">
+      <main className="mx-auto lg:container p-4 min-h-[50vh]">
         <Outlet />
       </main>
       <Footer />

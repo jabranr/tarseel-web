@@ -3,6 +3,7 @@ import InputSelect from '~/components/InputSelect';
 import InputText from '~/components/InputText';
 import InputTextArea from '~/components/InputTextArea';
 import { loader } from './loader';
+import { action } from './action';
 import {
   IconArrowRight,
   IconCurrencyPound,
@@ -11,17 +12,22 @@ import {
 } from '@tabler/icons-react';
 import Button from '~/components/Button';
 
-export { loader };
+export { loader, action };
 export default function SendParcel() {
   const { parcelTypes, deliverBy } = useLoaderData<typeof loader>();
 
   return (
     <Form
       action="/send-parcel"
-      method="post"
-      className="max-w-sm mx-auto [&>*+*]:mt-8"
+      method="POST"
+      className="max-w-sm mx-auto flex flex-col space-y-8"
     >
-      <InputSelect label="What is the type of parcel?" defaultValue="" required>
+      <InputSelect
+        name="type"
+        label="What is the type of parcel?"
+        defaultValue=""
+        required
+      >
         {parcelTypes.map((parcelType) => (
           <InputSelect.Option
             key={parcelType._id}
@@ -31,6 +37,7 @@ export default function SendParcel() {
         ))}
       </InputSelect>
       <InputSelect
+        name="destination"
         label="Where do you want to send it?"
         defaultValue=""
         required
@@ -41,6 +48,7 @@ export default function SendParcel() {
         <InputSelect.Option value="PK" label="Pakistan" />
       </InputSelect>
       <InputSelect
+        name="deliverBy"
         label="When do you want it delivered?"
         defaultValue=""
         required
@@ -53,10 +61,22 @@ export default function SendParcel() {
           />
         ))}
       </InputSelect>
-      <InputText name="value" label="Approx, how much is it worth?" required>
+      <InputText
+        name="value"
+        label="Approx, how much is it worth?"
+        required
+        type="number"
+        inputMode="numeric"
+      >
         <IconCurrencyPound className="w-5 h-5" />
       </InputText>
-      <InputText name="budget" label="What is your rough budget?" required>
+      <InputText
+        name="budget"
+        label="What is your rough budget?"
+        required
+        type="number"
+        inputMode="numeric"
+      >
         <IconCurrencyPound className="w-5 h-5" />
       </InputText>
 
@@ -65,21 +85,39 @@ export default function SendParcel() {
         label="How heavy is it?"
         placeholder="weight (kg)"
         required
+        type="number"
+        inputMode="numeric"
       >
         <IconWeight className="w-5 h-5" />
       </InputText>
 
       <InputText.Group label="What is the dimension?">
-        <InputText name="width" placeholder="width (cm)">
+        <InputText
+          name="width"
+          placeholder="width (cm)"
+          type="number"
+          inputMode="numeric"
+        >
           <IconRulerMeasure className="w-5 h-5" />
         </InputText>
-        <InputText name="height" placeholder="height (cm)" />
-        <InputText name="depth" placeholder="depth (cm)" />
+        <InputText
+          name="height"
+          placeholder="height (cm)"
+          type="number"
+          inputMode="numeric"
+        />
+        <InputText
+          name="depth"
+          placeholder="depth (cm)"
+          type="number"
+          inputMode="numeric"
+        />
       </InputText.Group>
 
       <InputTextArea name="description" label="Description" />
-      <Button>
-        Next <IconArrowRight />
+      <InputText type="hidden" name="origin" value="GB" />
+      <Button type="submit" fill>
+        Next <IconArrowRight className="w-5 h-5 ml-2" />
       </Button>
     </Form>
   );

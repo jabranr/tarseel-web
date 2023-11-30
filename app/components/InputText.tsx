@@ -3,13 +3,16 @@ import { ComponentProps } from 'react';
 
 export default function InputText({
   children,
+  className,
   ...props
 }: ComponentProps<'input'> & { label?: string }) {
+  const id = props.id || props.name;
+
   return (
     <div>
       {props.label && (
         <label
-          htmlFor={props.id || props.name}
+          htmlFor={id}
           className="block text-sm font-medium leading-6 text-gray-900"
         >
           {props.label}
@@ -22,12 +25,13 @@ export default function InputText({
       )}
       <div className="mt-1 relative">
         <input
-          id="email"
+          id={id}
           className={classNames(
             'block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-tarseel-primary sm:text-sm sm:leading-6',
             {
               'pl-9': Boolean(children)
-            }
+            },
+            className
           )}
           {...props}
         />
@@ -58,7 +62,9 @@ function Group({
           )}
         </label>
       )}
-      <div className="flex items-center space-x-2">{children}</div>
+      <div className="flex items-center justify-between space-x-2">
+        {children}
+      </div>
     </div>
   );
 }

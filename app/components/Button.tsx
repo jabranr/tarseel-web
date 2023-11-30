@@ -1,81 +1,93 @@
-import { ComponentProps } from 'react';
+import React, { forwardRef, ForwardedRef, ComponentProps } from 'react';
 import classNames from 'classnames';
-import { Link } from '@remix-run/react';
+import { twMerge } from 'tailwind-merge';
 
-export default function Button({
-  children,
-  type = 'button',
-  theme = 'primary',
-  size = 'default',
-  outlined = false,
-  inline = false,
-  fill = false,
-  disabled = false,
-  href,
-  to,
-  className,
-  ...attrs
-}: Props) {
-  const classes = classNames(
-    'inline-block rounded cursor-pointer text-base no-underline min-w-[120px] will-change-transform border-0 border-none pointer-events-all',
-    {
-      'px-[9px] py-[5px]': outlined,
-      'text-[0.9em] tracking-[0.75px] min-w-[100px] px-2.5 py-1.5':
-        size === 'small',
-      'px-3.5 py-2.5': size === 'default',
-      'px-[13px] py-[9px]': size === 'default' && outlined,
-      'text-[1.5em] px-[18px] py-3': size === 'large',
-      'px-[17px] py-[11px]': size === 'large' && outlined,
-      'pointer-events-none opacity-50': disabled,
-      'block w-full': fill,
-      'bg-[color:var(--special-blue)] text-[color:var(--light)]':
-        theme === 'primary',
-      'bg-[color:var(--light)] border-[color:var(--special-blue)] text-[color:var(--special-blue)] border-2 border-solid':
-        theme === 'primary' && outlined,
-      'bg-[color:var(--blue)] text-[color:var(--light)]': theme === 'secondary',
-      'bg-[color:var(--light)] border-[color:var(--blue)] text-[color:var(--blue)] border-2 border-solid':
-        theme === 'secondary' && outlined,
-      'bg-[color:var(--dark-gray)] text-[color:var(--light)]':
-        theme === 'tertiary',
-      'bg-[color:var(--light)] border-[color:var(--dark-gray)] text-[color:var(--dark-gray)] border-2 border-solid':
-        theme === 'tertiary' && outlined
-    },
-    className
-  );
+type ButtonProps = {
+  theme?: 'primary' | 'secondary' | 'tertiary' | 'outlined';
+  size?: 'giant' | 'large' | 'medium' | 'small' | 'tiny';
+  fill?: boolean;
+  linkComponent?: React.ElementType;
+  href?: string;
+  to?: string;
+  target?: string;
+  onClick?: React.MouseEventHandler<HTMLButtonElement | HTMLAnchorElement>;
+} & ComponentProps<'button'>;
 
-  if (type === 'link' && href && attrs.target === '_blank') {
-    attrs.rel = 'noopener noreferrer';
-  }
-
-  if (attrs.disabled) {
-    attrs['aria-disabled'] = true;
-  }
-
-  return type === 'link' ? (
-    to ? (
-      <Link className={classes} to={to} {...attrs}>
-        {children}
-      </Link>
-    ) : (
-      <a className={classes} href={href} {...attrs}>
-        {children}
-      </a>
-    )
-  ) : (
-    <button type={type} className={classes} {...attrs}>
-      {children}
-    </button>
-  );
-}
-
-type Props = (ComponentProps<'button'> | ComponentProps<'a'>) & {
-  theme: 'primary' | 'secondary' | 'tertiary';
-  size: 'small' | 'large' | 'default';
-  type: 'button' | 'submit' | 'a' | 'link';
-  outlined: boolean;
-  inline: boolean;
-  fill: boolean;
-  disabled: boolean;
-  href: string;
-  to: string;
+const themeClasses: Record<NonNullable<ButtonProps['theme']>, string> = {
+  primary:
+    'bg-tarseel-primary text-white hover:bg-tarseel-primary/75 active:bg-tarseel-primary/75',
+  secondary:
+    'bg-tarseel-gray text-tarseel-gray-dark hover:bg-white active:bg-[#ECECEC]',
+  tertiary:
+    'bg-tarseel-primary/50 text-white hover:bg-tarseel-primary/35 active:bg-tarseel-primary/35',
+  outlined:
+    'bg-white border-tarseel-gray text-tarseel-gray-dark hover:bg-tarseel-gray-light hover:border-tarseel-primary/50'
 };
+
+const sizeClasses: Record<NonNullable<ButtonProps['size']>, string> = {
+  giant: 'px-8 py-4 text-lg',
+  large: 'px-6 py-3',
+  medium: 'px-4 py-2',
+  small: 'px-3 py-1.5 text-sm',
+  tiny: 'px-3 py-0.5 text-sm'
+};
+
+const Button = forwardRef(
+  (
+    {
+      children,
+      theme = 'primary',
+      size = 'medium',
+      fill = false,
+      className,
+      linkComponent,
+      ...attrs
+    }: ButtonProps,
+    ref: ForwardedRef<HTMLButtonElement | HTMLAnchorElement | null>
+  ) => {
+    const combinedClasses = twMerge(
+      classNames(
+        'flex items-center justify-center cursor-pointer whitespace-nowrap border-[2px] border-transparent text-center rounded-md font-medium tracking-[0.35px] leading-5',
+        sizeClasses[size],
+        themeClasses[theme],
+        {
+          'pointer-events-none opacity-30': Boolean(attrs.disabled),
+          'w-full md:w-auto': !fill,
+          'w-full': fill
+        },
+        className
+      )
+    );
+
+    if (linkComponent !== undefined) {
+      const Component = linkComponent;
+
+      if (linkComponent === 'a' && attrs.href === undefined) {
+        attrs.href = attrs.to;
+      }
+
+      return (
+        <Component
+          ref={ref as ForwardedRef<HTMLAnchorElement>}
+          className={combinedClasses}
+          {...attrs}
+        >
+          {children}
+        </Component>
+      );
+    }
+
+    attrs.type = attrs.type || 'button';
+    return (
+      <button
+        ref={ref as ForwardedRef<HTMLButtonElement>}
+        className={combinedClasses}
+        {...attrs}
+      >
+        {children}
+      </button>
+    );
+  }
+);
+
+export default Button;
