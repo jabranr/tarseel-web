@@ -1,53 +1,52 @@
+import { parse } from '@conform-to/zod';
 import { ActionFunctionArgs, json, redirect } from '@remix-run/cloudflare';
-import { getTarseelSession } from '~/server/session.server';
+import { z } from 'zod';
 
-export type SendParcelPayload = {
-  destination: string;
-  deliverBy: string;
-  type: string;
-  value: string;
-  budget: string;
-  weight: string;
-  width?: string;
-  height?: string;
-  depth?: string;
-  description?: string;
-};
+const schema = z.object({
+  type: z.string({ required_error: 'Parcel type is required' }),
+  destination: z.string({ required_error: 'Destination is required' }),
+  deliverBy: z.string({ required_error: 'Delivery timeframe is required' }),
+  value: z.number({ required_error: "Provide item's estimated value" }),
+  budget: z.number({ required_error: 'Provide your budget' }),
+  weight: z.number({ required_error: "Provide item's weight" }),
+  width: z
+    .number({
+      invalid_type_error: 'Provide item width in centimeters (cm)'
+    })
+    .optional(),
+  height: z
+    .number({
+      invalid_type_error: 'Provide item height in centimeters (cm)'
+    })
+    .optional(),
+  depth: z
+    .number({
+      invalid_type_error: 'Provide item depth in centimeters (cm)'
+    })
+    .optional(),
+  description: z
+    .string()
+    .min(5, { message: 'Description is too short' })
+    .optional()
+});
 
 export async function action({ request, context }: ActionFunctionArgs) {
   const formData = await request.formData();
-  const data = Object.fromEntries(formData.entries()) as SendParcelPayload;
+  const submission = parse(formData, { schema });
 
-  // TODO if anonymous user, create a session
-  // redirect to login/signup page with link back to this page and prefill form
+  if (submission.intent !== 'submit' || !submission.value) {
+    return json(submission, { status: 400 });
+  }
 
   const response = await fetch(`${context.env.REST_API_URL}/api/parcels`, {
     method: 'POST',
-    body: JSON.stringify(data)
+    body: JSON.stringify(submission.value)
   });
 
   if (response.ok) {
-    return redirect('/parcels');
+    const { id } = await response.json<{ id: string }>();
+    return redirect(`/parcels/${id}`);
   }
 
-  if (response.status === 401) {
-    const { getSession, commitSession } = getTarseelSession(context);
-    const session = await getSession();
-
-    if (!session.has('draft')) {
-      session.set('draft', JSON.stringify(data));
-    }
-
-    return redirect('/login?redirect=/send-parcel', {
-      headers: {
-        'Set-Cookie': await commitSession(session)
-      }
-    });
-  }
-
-  // return with form error
-  return json(
-    { formError: 'Something went wrong', values: data },
-    { status: 400 }
-  );
+  return json(submission, { status: 400 });
 }

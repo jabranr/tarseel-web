@@ -5,9 +5,7 @@ import { z } from 'zod';
 const schema = z.object({
   email: z
     .string({ required_error: 'Email is required' })
-    .email('Email is invalid'),
-  password: z.string({ required_error: 'Password is required' }),
-  redirectTo: z.string().optional()
+    .email('Email is invalid')
 });
 
 export async function action({ request, context }: ActionFunctionArgs) {
@@ -18,18 +16,17 @@ export async function action({ request, context }: ActionFunctionArgs) {
     return json(submission, { status: 400 });
   }
 
-  const response = await fetch(`${context.env.REST_API_URL}/api/login`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(submission.value)
-  });
+  const response = await fetch(
+    `${context.env.REST_API_URL}/api/forgotten-password`,
+    {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(submission.value)
+    }
+  );
 
   if (response.ok) {
-    return redirect(submission.value.redirectTo || '/account/parcels', {
-      headers: {
-        'Set-Cookie': response.headers.get('Set-Cookie') || ''
-      }
-    });
+    return redirect('/forgotten-password/success');
   }
 
   return json(submission, { status: 400 });

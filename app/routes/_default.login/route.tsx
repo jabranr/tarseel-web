@@ -1,21 +1,30 @@
-import { Form, Link } from '@remix-run/react';
+import { Form, Link, useActionData, useLoaderData } from '@remix-run/react';
 import Button from '~/components/Button';
 import InputText from '~/components/InputText';
+import { useForm } from '@conform-to/react';
 import { action } from './action';
+import { loader } from './loader';
 
-export { action };
+export { loader, action };
 export default function Login() {
+  const { redirectTo } = useLoaderData<typeof loader>();
+  const lastSubmission = useActionData<typeof action>();
+  const [form, fields] = useForm({ lastSubmission, shouldValidate: 'onBlur' });
+
   return (
     <Form
       action="/login"
       method="POST"
       className="max-w-sm mx-auto flex flex-col space-y-8"
+      {...form.props}
     >
       <InputText
         maxLength={255}
         label=" Email"
         type="email"
         name="email"
+        defaultValue={fields.email.defaultValue}
+        error={fields.email.error}
         required
       />
       <InputText
@@ -23,8 +32,11 @@ export default function Login() {
         label="Password"
         type="password"
         name="password"
+        defaultValue={fields.password.defaultValue}
+        error={fields.password.error}
         required
       />
+      <InputText type="hidden" name="redirectTo" value={redirectTo} />
       <Button fill type="submit">
         Login
       </Button>

@@ -4,9 +4,20 @@ import { ComponentProps } from 'react';
 export default function InputText({
   children,
   className,
+  helperText,
+  error,
   ...props
-}: ComponentProps<'input'> & { label?: string }) {
+}: ComponentProps<'input'> & {
+  label?: string;
+  helperText?: string;
+  error?: string;
+}) {
   const id = props.id || props.name;
+  const errorId = `${id}-error`;
+
+  if (props.type === 'hidden') {
+    return <input id={id} {...props} />;
+  }
 
   return (
     <div>
@@ -27,9 +38,10 @@ export default function InputText({
         <input
           id={id}
           className={classNames(
-            'block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-tarseel-primary sm:text-sm sm:leading-6',
+            'block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-tarseel-primary sm:text-sm sm:leading-6 ',
             {
-              'pl-9': Boolean(children)
+              'pl-9': Boolean(children),
+              'invalid:ring-red-700': error
             },
             className
           )}
@@ -41,6 +53,14 @@ export default function InputText({
           </div>
         )}
       </div>
+      {helperText && (
+        <p className="text-xs text-tarseel-gray-dark mt-1">{helperText}</p>
+      )}
+      {error && (
+        <p id={errorId} className="text-xs text-red-700 mt-1">
+          {error}
+        </p>
+      )}
     </div>
   );
 }
@@ -62,7 +82,7 @@ function Group({
           )}
         </label>
       )}
-      <div className="flex items-center justify-between space-x-2">
+      <div className="flex items-start justify-between space-x-2">
         {children}
       </div>
     </div>

@@ -1,12 +1,15 @@
+import classNames from 'classnames';
 import { ComponentProps } from 'react';
 
 export default function InputSelect({
   children,
   placeholder = 'Select an option',
   label,
+  error,
   ...props
-}: ComponentProps<'select'> & { label?: string }) {
+}: ComponentProps<'select'> & { label?: string; error?: string }) {
   const id = props.id || props.name;
+  const errorId = `${id}-error`;
 
   return (
     <div>
@@ -26,7 +29,12 @@ export default function InputSelect({
       <select
         id={id}
         defaultValue=""
-        className="relative w-full cursor-default mt-1 rounded-md bg-white py-1.5 pl-3 pr-10 text-left text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:outline-none focus:ring-2 focus:ring-tarseel-primary sm:text-sm sm:leading-6"
+        className={classNames(
+          'relative w-full cursor-default mt-1 rounded-md bg-white py-1.5 pl-3 pr-10 text-left shadow-sm text-gray-900 ring-1 ring-inset ring-gray-300 focus:outline-none focus:ring-2 focus:ring-tarseel-primary sm:text-sm sm:leading-6 border-none',
+          {
+            'invalid:ring-red-700': error
+          }
+        )}
         {...props}
       >
         <option
@@ -36,6 +44,11 @@ export default function InputSelect({
         />
         {children}
       </select>
+      {error && (
+        <p id={errorId} className="text-xs text-red-700 mt-1">
+          {error}
+        </p>
+      )}
     </div>
   );
 }
