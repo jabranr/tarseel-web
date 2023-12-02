@@ -1,14 +1,6 @@
 import { parse } from '@conform-to/zod';
 import { ActionFunctionArgs, json, redirect } from '@remix-run/cloudflare';
-import { z } from 'zod';
-
-const schema = z.object({
-  email: z
-    .string({ required_error: 'Email is required' })
-    .email('Email is invalid'),
-  password: z.string({ required_error: 'Password is required' }),
-  redirectTo: z.string().optional()
-});
+import { schema } from './schema';
 
 export async function action({ request, context }: ActionFunctionArgs) {
   const formData = await request.formData();
@@ -32,5 +24,5 @@ export async function action({ request, context }: ActionFunctionArgs) {
     });
   }
 
-  return json(submission, { status: 400 });
+  return response;
 }

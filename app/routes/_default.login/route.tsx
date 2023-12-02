@@ -1,15 +1,22 @@
 import { Form, Link, useActionData, useLoaderData } from '@remix-run/react';
+import { parse, useForm } from '@conform-to/react';
 import Button from '~/components/Button';
 import InputText from '~/components/InputText';
-import { useForm } from '@conform-to/react';
 import { action } from './action';
+import { schema } from './schema';
 import { loader } from './loader';
 
 export { loader, action };
 export default function Login() {
   const { redirectTo } = useLoaderData<typeof loader>();
   const lastSubmission = useActionData<typeof action>();
-  const [form, fields] = useForm({ lastSubmission, shouldValidate: 'onBlur' });
+  const [form, fields] = useForm({
+    lastSubmission,
+    shouldValidate: 'onBlur',
+    onValidate({ formData }) {
+      return parse(formData, { schema });
+    }
+  });
 
   return (
     <Form

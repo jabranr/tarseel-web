@@ -38,9 +38,15 @@ export async function action({ request, context }: ActionFunctionArgs) {
     return json(submission, { status: 400 });
   }
 
+  console.log('request.headers', request.headers.get('Cookie'));
+
   const response = await fetch(`${context.env.REST_API_URL}/api/parcels`, {
     method: 'POST',
-    body: JSON.stringify(submission.value)
+    body: JSON.stringify(submission.value),
+    headers: {
+      'Content-Type': 'application/json',
+      'Set-Cookie': request.headers.get('Cookie') || ''
+    }
   });
 
   if (response.ok) {
@@ -48,5 +54,5 @@ export async function action({ request, context }: ActionFunctionArgs) {
     return redirect(`/parcels/${id}`);
   }
 
-  return json(submission, { status: 400 });
+  return response;
 }

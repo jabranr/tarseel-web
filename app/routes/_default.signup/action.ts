@@ -1,7 +1,6 @@
 import { parse } from '@conform-to/zod';
 import { ActionFunctionArgs, json, redirect } from '@remix-run/cloudflare';
 import { z } from 'zod';
-import { getTarseelSession } from '~/server/session.server';
 
 const schema = z.object({
   firstName: z
@@ -24,8 +23,6 @@ const schema = z.object({
 });
 
 export async function action({ request, context }: ActionFunctionArgs) {
-  const { getSession, commitSession } = getTarseelSession(context);
-  const session = await getSession();
   const formData = await request.formData();
   const submission = parse(formData, { schema });
 
@@ -42,7 +39,7 @@ export async function action({ request, context }: ActionFunctionArgs) {
   if (response.ok) {
     return redirect('/account/parcels', {
       headers: {
-        'Set-Cookie': await commitSession(session)
+        'Set-Cookie': response.headers.get('Set-Cookie') || ''
       }
     });
   }
